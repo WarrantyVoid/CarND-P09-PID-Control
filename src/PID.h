@@ -1,22 +1,9 @@
 #ifndef PID_H
 #define PID_H
 
-class PID {
+class PID
+{
 public:
-  /*
-  * Errors
-  */
-  double p_error;
-  double i_error;
-  double d_error;
-
-  /*
-  * Coefficients
-  */ 
-  double Kp;
-  double Ki;
-  double Kd;
-
   /*
   * Constructor
   */
@@ -27,10 +14,12 @@ public:
   */
   virtual ~PID();
 
+
+public:
   /*
   * Initialize PID.
   */
-  void Init(double Kp, double Ki, double Kd);
+  void Init(double KP, double KI, double KD);
 
   /*
   * Update the PID error variables given cross track error.
@@ -38,9 +27,19 @@ public:
   void UpdateError(double cte);
 
   /*
-  * Calculate the total PID error.
+  * Calculate the steering.
   */
-  double TotalError();
+  double GetSteering() const;
+
+private:
+  double mErrorP;
+  double mErrorI;
+  double mErrorD;
+  bool mHasLastError;
+  double mLastError;
+  double mKP;
+  double mKI;
+  double mKD;
 };
 
 #endif /* PID_H */
