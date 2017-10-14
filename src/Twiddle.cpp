@@ -38,6 +38,8 @@ void Twiddle::Init(int numRuns, const TParameters &parameters, const TParameters
   mIsIniRun = true;
   mIsInvRun = false;
   mPID1.Init(mParameters[0], mParameters[1], mParameters[2]);
+
+  // Throttle controller disabled
   mPID2.Init(1.0, 0, 0);
   mPID2.UpdateError(0.7);
 }
@@ -79,7 +81,7 @@ ETwiddleResult Twiddle::Update(double cte)
       }
       else
       {
-        mParameters[mCurParameter] -= 2 * mDeltas[mCurParameter];
+        mParameters[mCurParameter] -= 3 * mDeltas[mCurParameter];
         mIsInvRun = true;
       }
     }
@@ -90,6 +92,7 @@ ETwiddleResult Twiddle::Update(double cte)
       mCurParameter = 0;
       if (std::accumulate(mDeltas.begin(), mDeltas.end(), 0.0) <= mTolerance)
       {
+        std::cout << "Final twiddle error = " << mBestError << std::endl;
         std::cout << "Final twiddle params = ";
         for (TParameters::const_iterator i = mParameters.begin(); i != mParameters.end(); ++i)
         {
@@ -103,9 +106,19 @@ ETwiddleResult Twiddle::Update(double cte)
         return TwiddleFinished;
       }
     }
-    std::cout << "Cur twiddle error = " << mBestError << std::endl;
     mParameters[mCurParameter] += mDeltas[mCurParameter];
     mPID1.Init(mParameters[0], mParameters[1], mParameters[2]);
+    std::cout << "Cur twiddle error = " << error << std::endl;
+    std::cout << "Cur twiddle params = ";
+    for (TParameters::const_iterator i = mParameters.begin(); i != mParameters.end(); ++i)
+    {
+      if (i != mParameters.begin())
+      {
+         std::cout << ", ";
+      }
+      std::cout << *i;
+    }
+    std::cout << std::endl;
     return RunFinished;
   }
   return None;

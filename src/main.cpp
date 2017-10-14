@@ -50,21 +50,20 @@ int main()
   uWS::Hub h;
   PID pidSteer;
   PID pidThrottle;
-  Twiddle twiddle(pidSteer, pidThrottle, 0.5);
+  Twiddle twiddle(pidSteer, pidThrottle, 0.4);
 
   TParameters p;
-  p.push_back(0.2);
-  p.push_back(0.004);
-  p.push_back(3.0);
+  p.push_back(0.561163);
+  p.push_back(0.00686839);
+  p.push_back(4.52613);
 
   TParameters d;
   d.push_back(0.1);
   d.push_back(0.001);
   d.push_back(1.0);
 
-  twiddle.Init(1000, p, d);
-  //pidSteer.Init(0.2, 0, 3);
-  //pidThrottle.Init(0.2, 0.0, 3.0);
+  // Init twiddle as wrapper around controllers.
+  twiddle.Init(0, p, d);
 
   h.onMessage([&twiddle, &pidSteer, &pidThrottle](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode)
   {
@@ -85,8 +84,10 @@ int main()
           //double speed = std::stod(j[1]["speed"].get<std::string>());
           //double angle = std::stod(j[1]["steering_angle"].get<std::string>());
 
+          // Update controller with cross track error
           ETwiddleResult result = twiddle.Update(cte);
-          //pidSteer.UpdateError(cte);
+
+          // Get steering values
           double steerValue = pidSteer.GetControl();
           double throttleValue = 1.0 + pidThrottle.GetControl();
           steerValue = std::max(-1.0, std::min(1.0, steerValue));

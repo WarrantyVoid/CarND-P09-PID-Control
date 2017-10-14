@@ -48,7 +48,6 @@ void PID::UpdateError(double cte)
   ++mNumUpdates;
   mTotalError += pow(cte, 2);
   mControl = -mKP * mErrorP - mKI * mErrorI - mKD * mErrorD;
-  mTotalError += 0.5 * pow(mControl, 2);
   //std::cout << "CTE: " << cte << "(" << mErrorP << ", " << mErrorI << ", " << mErrorD << ")" << std::endl;
 }
 

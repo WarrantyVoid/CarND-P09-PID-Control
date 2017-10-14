@@ -46,37 +46,33 @@ The integral component expresses the correction to steering over driving time. I
 #### 2. Describe how the final hyper parameters were chosen.
 
 I've started out with the hyper parameters given in the lesson:
-* tau_p = 0.2
-* tau_i = 0.004
-* tau_d = 3.0
+* tau_p = **0.2**
+* tau_i = **0.004**
+* tau_d = **3.0**
 
-which resulted in a mse to reference path of **0.208** after 1000 frames.
+which resulted in a MSE to reference path of **0.201** after 1400 frames on throttle 0.3. These values already lead to a  safely driven lap around the simulator course .
 
-These values have already lead to a  safely driven lap around the simulator course with speed 30.
+I further tried to use a PID control for both steering and throttle, but the twiddle optimizer just ended up with hyper parameters which caused the vehicle velocity to drop to minimum. 
 
-I further tried to use a PID control for both steering and throttle, but the twiddle optimizer just ended up with hyper parameters which caused the vehicle velocity to drop to minimum. Also using twiddling so many parameters with the simulator is very time consuming. 
-
-So I ran the twiddle optimizer once again with only PID control for steering. As initial deltas I have chosen:
+Also using twiddle with so many parameters and the simulator is very time consuming, so I ran the twiddle optimizer again with only PID control for steering. As initial deltas I have chosen:
 * delta_tau_p = 0.1
 * delta_tau_i = 0.001
 * delta_tau_d = 1.0
  
 The optimizer finished with a tolerance of 0.2 and the values:
-* tau_p = 2.63903
-* tau_i = 0.0142273
-* tau_d = 32.8519
+* tau_p = **2.80398**
+* tau_i = **0.0151273**
+* tau_d = **34.9519**
 
-plus a mse to reference path of **0.0152**
+plus a MSE to reference path of **0.0149** after 1400 frames on throttle 0.3. The values lead to a safely driven lap around the simulator course.
 
-The mse was great, but the car movement was not desirable. These parameters basically abuse the simulator quirk, that the simulated car loses velocity whenever the steering angle is changed quickly in succession. Thus, the car "wiggles" along the reference line with 7 speed, although based on throttling parameter, it would be allowed to go at 30.
+The MSE was great, but the car movement was not desirable. These parameters basically abuse the simulator quirk, that the simulated car loses velocity whenever the steering angle is changed quickly in succession. Thus, the car "wiggles" along the reference line with 7 speed, although it would be allowed to go at 30 based on throttle parameter.
+
+At this point, I realized there was a bug in my twiddle optimization causing the finding of these unusual optimizations.
  
-Maybe the mse alone is not the key for optimizing, so I added 0.5 x steering angle^2 to each mse value to prevent the above optimization from happening. This increased the mse of lesson parameters to **0.221**.
- 
-After another attempt to use the twiddle optimizer with the simulator, it finished with a tolerance of 0.5 and the values:
-* tau_p = 2.63903
-* tau_i = 0.0142273
-* tau_d = 32.8519
+After correcting the bug, I ran the twiddle optimizer with the simulator one final time. It finished with a tolerance of 0.4 and the values:
+* tau_p = **0.561163**
+* tau_i = **0.00686839**
+* tau_d = **4.52613**
 
-plus a mse to reference path of **?**
-
-These are my chosen hyper parameters.
+plus a MSE to reference path of **0.0955** after 1400 frames on throttle 0.3. The values lead to a safely driven lap around the simulator course. These are my chosen hyper parameters.
