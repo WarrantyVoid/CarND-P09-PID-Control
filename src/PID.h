@@ -27,19 +27,26 @@ public:
   void UpdateError(double cte);
 
   /*
-  * Calculate the steering.
+  * Calculate the mean squared PID error.
   */
-  double GetSteering() const;
+  double GetMeanSquaredError() const;
+
+  /*
+  * Calculate the control value.
+  */
+  double GetControl() const;
 
 private:
   double mErrorP;
   double mErrorI;
   double mErrorD;
-  bool mHasLastError;
+  int mNumUpdates;
   double mLastError;
+  double mTotalError;
   double mKP;
   double mKI;
   double mKD;
+  double mControl;
 };
 
 #endif /* PID_H */
